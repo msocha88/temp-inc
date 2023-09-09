@@ -1,12 +1,15 @@
-package io.kontakt.apps.anomaly.detector;
+package io.kontak.apps.anomaly.detector;
 
 import io.kontak.apps.event.Anomaly;
 import io.kontak.apps.event.TemperatureReading;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TemperatureMeasurementsListenerTest extends AbstractIntegrationTest {
 
@@ -27,12 +30,28 @@ public class TemperatureMeasurementsListenerTest extends AbstractIntegrationTest
                      kafkaContainer.getBootstrapServers(),
                      inputTopic
              )) {
-            TemperatureReading temperatureReading = new TemperatureReading(20d, "room", "thermometer", Instant.parse("2023-01-01T00:00:00.000Z"));
-            producer.produce(temperatureReading.thermometerId(), temperatureReading);
+
+            var constantTemp = 20d;
+
+            var temperatureReadingList = provideConstantTempReadings(constantTemp,10);
+            TemperatureReading anomaly = new TemperatureReading(constantTemp + 6, "room", "thermometer", Instant.now());
+            temperatureReadingList.add(anomaly);
+
+            temperatureReadingList.forEach( tr ->producer.produce(tr.thermometerId(), tr));
             consumer.drain(
-                    consumerRecords -> consumerRecords.stream().anyMatch(r -> r.value().thermometerId().equals(temperatureReading.thermometerId())),
+                    consumerRecords -> consumerRecords.stream().anyMatch(r -> r.value().thermometerId().equals(anomaly.thermometerId())),
                     Duration.ofSeconds(5)
             );
         }
+    }
+
+    @NotNull
+    private static List<TemperatureReading> provideConstantTempReadings(double temp, int objectsToProvide) {
+        var result = new ArrayList<TemperatureReading>();
+        var now = Instant.now();
+        while ( objectsToProvide-- > 0 ) {
+            result.add(new TemperatureReading(temp, "room", "thermometer", now.minusSeconds(objectsToProvide)));
+        }
+        return result;
     }
 }
