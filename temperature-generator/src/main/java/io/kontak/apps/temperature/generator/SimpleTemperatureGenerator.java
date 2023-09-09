@@ -1,30 +1,48 @@
 package io.kontak.apps.temperature.generator;
 
 import io.kontak.apps.event.TemperatureReading;
-import org.springframework.stereotype.Component;
+import io.kontak.apps.temperature.generator.model.Thermometer;
+import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
-@Component
+@RequiredArgsConstructor
 public class SimpleTemperatureGenerator implements TemperatureGenerator {
 
-    private final Random random = new Random();
+    private static final Random random = new Random();
+
+    private final double anomalyRate;
+    private final List<Thermometer> thermometers;
 
     @Override
     public List<TemperatureReading> generate() {
-        return List.of(generateSingleReading());
+        return thermometers.stream().map(this::generateSingleReading).toList();
     }
 
-    private TemperatureReading generateSingleReading() {
-        //TODO basic implementation, should be changed to the one that will allow to test and demo solution on realistic data
+    private TemperatureReading generateSingleReading(Thermometer thermometer) {
         return new TemperatureReading(
-                random.nextDouble(10d, 30d),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
+                generateTemperature(),
+                thermometer.getRoomId(),
+                thermometer.getThermometerId(),
                 Instant.now()
         );
     }
+
+    private double generateTemperature() {
+
+        var randomNumber = random.nextDouble();
+        return (randomNumber < (1 - anomalyRate))
+                ? getTemperature(false)
+                : getTemperature(true);
+        }
+
+    private double getTemperature(boolean isAnomaly) {
+
+        return isAnomaly
+                ? random.nextInt(250, 360) / 10.0
+                : random.nextInt(190, 200) / 10.0 ;
+    }
+
 }
