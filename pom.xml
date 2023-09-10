@@ -22,6 +22,8 @@
 		<module>anomaly-storage</module>
 		<module>temperature-analytics-api</module>
 		<module>temperature-domain</module>
+		<module>temperature-dao</module>
+
 	</modules>
 
 	<properties>
@@ -35,13 +37,16 @@
 
 	<dependencyManagement>
 		<dependencies>
-
 			<dependency>
 				<groupId>io.kontak.apps</groupId>
 				<artifactId>temperature-domain</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
-
+			<dependency>
+				<groupId>io.kontak.apps</groupId>
+				<artifactId>temperature-dao</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-actuator</artifactId>

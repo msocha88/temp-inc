@@ -18,6 +18,11 @@
         </dependency>
 
         <dependency>
+            <groupId>io.kontak.apps</groupId>
+            <artifactId>temperature-dao</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-stream-binder-kafka-streams</artifactId>
         </dependency>
