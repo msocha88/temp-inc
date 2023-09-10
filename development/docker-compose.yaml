@@ -38,3 +38,12 @@ services:
       - 8085:9000
     environment:
       KAFKA_BROKERCONNECT: broker-temp-task:9092
+
+  mongodb:
+    image: mongo:6-jammy
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata6:/data/db
+volumes:
+  dbdata6:
